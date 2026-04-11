@@ -1,0 +1,47 @@
+digraph ClassDiagram {
+    rankdir=TB;
+    nodesep=0.6;
+    ranksep=0.8;
+    node [shape=record, fontname="Arial"];
+    edge [fontname="Arial", fontsize=10];
+
+    IGameRule [label = "{«interface»\nIGameRule\n|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}", shape=record];
+    IFieldShape [label = "{«interface»\nIFieldShape\n|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}", shape=record];
+
+    ClassicRule [label = "{ClassicRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
+    NoBonusRule [label = "{NoBonusRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
+    PenaltyRule [label = "{PenaltyRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
+
+    RectangularShape [label = "{RectangularShape\l- width: int\l- height: int\l|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}"];
+    CustomShape [label = "{CustomShape|- boxMask: List<Box>|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()}"];
+
+    UI [label = "{UserInterface|\l- gameControl: GameControl\l- stats: StatisticsAndLeaderboard\l|+ fieldRendering()\l+ menuRendering()\l+ buttonRendering()\l+ showLeaderboard()\l}"];
+    GameControl [label = "{GameControl|\l- gameLogic: GameLogic\l- config: Configuration\l- saving: SavingAndLoading\l- currentPlayer: int\l|+ startGame()\l+ endGame()\l+ resetGame()\l+ sequenceControl()\l}"];
+    GameLogic [label = "{GameLogic|\l- board: Board\l- players: List<Player>\l- rule: IGameRule\l- shape: IFieldShape\l|+ validation()\l+ squaresSearch()\l+ scoring()\l+ gameEndCheck()\l}"];
+    Configuration [label = "{Configuration|\l- selectedRule: IGameRule\l- selectedShape: IFieldShape\l- fieldSize: int\l- playersNames: List<String>\l|+ selectingFieldShape()\l+ selectingRulesMode()\l+ selectingFieldSize()\l+ selectingNamesAndNumberOfPlayers()\l}"];
+    SavingLoading [label = "{SavingAndLoading|\l- connection: DBConnection\l|+ recordingGameToDatabase()\l+ readingHistory()\l+ playbackByTurns()\l}"];
+    Stats [label = "{StatisticsAndLeaderboard|\l- gamesHistory: List<Game>\l|+ ratingsCalculation()\l+ leaderboardDisplay()\l}"];
+
+    ClassicRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    NoBonusRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    PenaltyRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    RectangularShape -> IFieldShape [arrowhead="empty", style=dashed, label="реализует"];
+    CustomShape -> IFieldShape [arrowhead="empty", style=dashed, label="реализует"];
+
+    UI -> GameControl [arrowhead="vee", label="вызывает"];
+    UI -> Stats [arrowhead="vee", label="запрашивает"];
+    UI -> Configuration [arrowhead="vee", label="передаёт настройки"];
+    GameControl -> GameLogic [arrowhead="vee", label="использует"];
+    GameControl -> SavingLoading [arrowhead="vee", label="сохраняет"];
+    GameControl -> Configuration [arrowhead="vee", label="получает"];
+    SavingLoading -> Stats [arrowhead="vee", label="передаёт данные"];
+
+    Configuration -> ClassicRule [style=dashed, arrowhead="vee", label="создаёт"];
+    Configuration -> NoBonusRule [style=dashed, arrowhead="vee", label="создаёт"];
+    Configuration -> PenaltyRule [style=dashed, arrowhead="vee", label="создаёт"];
+    Configuration -> RectangularShape [style=dashed, arrowhead="vee", label="создаёт"];
+    Configuration -> CustomShape [style=dashed, arrowhead="vee", label="создаёт"];
+
+    GameLogic -> IGameRule [style=dashed, arrowhead="vee", label="зависит"];
+    GameLogic -> IFieldShape [style=dashed, arrowhead="vee", label="зависит"];
+}
