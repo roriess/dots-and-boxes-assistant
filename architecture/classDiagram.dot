@@ -1,0 +1,63 @@
+digraph ClassDiagram {
+    rankdir=TB;
+    nodesep=0.6;
+    ranksep=0.8;
+    node [shape=record, fontname="Arial"];
+    edge [fontname="Arial", fontsize=10];
+
+    subgraph cluster_0 {
+        color = white;
+        IGameRule [label = "{«interface»\nIGameRule\n|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}", shape=record];
+        IFieldShape [label = "{«interface»\nIFieldShape\n|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}", shape=record];
+    }
+
+    UI [label = "{UserInterface|\l- gameControl: GameControl\l- stats: StatisticsAndLeaderboard\l|+ fieldRendering()\l+ menuRendering()\l+ buttonRendering()\l+ showLeaderboard()\l}"];
+    GameControl [label = "{GameControl|\l- gameLogic: GameLogic\l- config: Configuration\l- saving: SavingAndLoading\l- currentPlayer: int\l|+ startGame()\l+ endGame()\l+ resetGame()\l}"];
+
+    Stats [label = "{StatisticsAndLeaderboard|\l- gamesHistory: List~Game~\l|+ ratingsCalculation()\l}"];
+    GameLogic [label = "{GameLogic|\l- board: Board\l- players: List~Player~\l- rule: IGameRule\l- shape: IFieldShape\l|+ validation()\l+ squaresSearch()\l+ scoring()\l+ gameEndCheck()\l}"];
+
+    subgraph cluster_1 {
+        color = white;
+        CustomShape [label = "{CustomShape|\l- boxMask: List~Box~\l|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}"];
+        RectangularShape [label = "{RectangularShape\l- width: int\l- height: int\l|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}"];
+        ClassicRule [label = "{ClassicRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
+        NoBonusRule [label = "{NoBonusRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
+        PenaltyRule [label = "{PenaltyRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
+    }
+
+    subgraph cluster_3 {
+        color = white;
+        SavingLoading [label = "{Repository|\l- connection: DBConnection\l|+ recordingGameToDatabase()\l+ readingHistory()\l+ playbackByTurns()\l}"];
+        Configuration [label = "{Configuration|\l- selectedRule: IGameRule\l- selectedShape: IFieldShape\l- fieldSize: int\l- playersNames: List~String~\l|+ selectingFieldShape()\l+ selectingRulesMode()\l+ selectingFieldSize()\l+ selectingNamesAndNumberOfPlayers()\l}"];
+        GameFactory [label = "{GameFactory\l|+ createRule(type: String): IGameRule\l+ createShape(type: String): IFieldShape\l}"];
+    }
+
+    Configuration -> GameFactory [arrowhead="vee", label="использует"];
+
+    GameFactory -> IGameRule [arrowhead="vee", label="создаёт реализации"];
+    GameFactory -> IFieldShape [arrowhead="vee", label="создаёт реализации"];
+
+    GameFactory -> ClassicRule [arrowhead="vee", label="создаёт"];
+    GameFactory -> NoBonusRule [arrowhead="vee", label="создаёт"];
+    GameFactory -> PenaltyRule [arrowhead="vee", label="создаёт"];
+    GameFactory -> RectangularShape [arrowhead="vee", label="создаёт"];
+    GameFactory -> CustomShape [arrowhead="vee", label="создаёт"];
+
+    ClassicRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    NoBonusRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    PenaltyRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    RectangularShape -> IFieldShape [arrowhead="empty", style=dashed, label="реализует"];
+    CustomShape -> IFieldShape [arrowhead="empty", style=dashed, label="реализует"];
+
+    UI -> GameControl [arrowhead="vee", label="вызывает"];
+    UI -> Stats [arrowhead="vee", label="запрашивает"];
+    Configuration -> UI [arrowhead="vee", label="передаёт настройки"];
+    GameControl -> GameLogic [arrowhead="vee", label="использует"];
+    GameControl -> SavingLoading [arrowhead="vee", label="сохраняет"];
+    GameControl -> Configuration [arrowhead="vee", label="получает"];
+    Stats -> SavingLoading [arrowhead="vee", label="сохраняет статистику"];
+
+    GameLogic -> IGameRule [arrowhead="vee", label="проверяет ход и считает очки"];
+    GameLogic -> IFieldShape [arrowhead="vee", label="получает квадраты и проверяет рёбра"];
+}
