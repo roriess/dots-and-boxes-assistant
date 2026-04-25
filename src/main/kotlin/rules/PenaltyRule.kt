@@ -1,10 +1,6 @@
 package rules
 
 class PenaltyRule(): IGameRule {
-    override fun validateMove(isEdge: Boolean): Boolean {
-        return !isEdge
-    }
-
     override fun calculateScore(closedBoxesCount: Int): Int {
         return -closedBoxesCount
     }

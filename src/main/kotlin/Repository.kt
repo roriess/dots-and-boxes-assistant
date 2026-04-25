@@ -2,13 +2,20 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.Statement
 
-class Repository(private val dbFileName: String = "game_history.db") {
-    private var connection: Connection
+open class Repository(private val dbFileName: String = "game_history.db") {
+    private lateinit var connection: Connection
+
+    constructor(connection: Connection) : this() {
+        this.connection = connection
+        createTables()
+    }
 
     init {
-        Class.forName("org.sqlite.JDBC")
-        connection = DriverManager.getConnection("jdbc:sqlite:$dbFileName")
-        createTables()
+        if (!::connection.isInitialized) {
+            Class.forName("org.sqlite.JDBC")
+            connection = DriverManager.getConnection("jdbc:sqlite:$dbFileName")
+            createTables()
+        }
     }
 
     private fun createTables() {
@@ -31,7 +38,7 @@ class Repository(private val dbFileName: String = "game_history.db") {
         }
     }
 
-    fun saveGame(winnerName: String, playersNames: List<String>) {
+    open fun saveGame(winnerName: String, playersNames: List<String>) {
         val playerIds = playersNames.map { name ->
             val select = connection.prepareStatement("SELECT id FROM players WHERE name = ?")
             select.setString(1, name)
