@@ -1,10 +1,9 @@
 import java.util.*
-import rules.ClassicRule
-import rules.IGameRule
-import rules.NoBonusRule
-import rules.PenaltyRule
+import rules.*
 import shapes.RectangularShape
+import shapes.CustomShape
 import logic.Edge
+import logic.Box
 
 class ConsoleUI {
     private val scanner = Scanner(System.`in`)
@@ -43,14 +42,33 @@ class ConsoleUI {
             else -> ClassicRule()
         }
 
-        println("Field shape: 1 - Rectangular (others not yet implemented)")
+        println("Field shape: 1 - Rectangular, 2 - Custom")
         val shapeChoice = scanner.nextLine().toIntOrNull() ?: 1
         val shape = when (shapeChoice) {
-            1 -> RectangularShape(fieldSize)
-            else -> RectangularShape(fieldSize)
+            1 -> RectangularShape(listOf<Int>(height, width))
+            2 -> {
+                println("Enter a list of squares in the format x y (separated by spaces), with a blank line to end:")
+                val boxes = mutableListOf<Box>()
+                while (true) {
+                    val line = scanner.nextLine()
+                    if (line.isBlank()) break
+                    val parts = line.split(" ")
+                    if (parts.size == 2) {
+                        val x = parts[0].toIntOrNull()
+                        val y = parts[1].toIntOrNull()
+                        if (x != null && y != null) boxes.add(Box(x, y))
+                        else println("Invalid format, please try again")
+                    } else println("Enter two numbers, for example: 0 0")
+                }
+                if (boxes.isEmpty()) {
+                    println("The list is empty, using the default 2x2 field")
+                    CustomShape(listOf(Box(0,0), Box(1,0), Box(0,1), Box(1,1)))
+                } else CustomShape(boxes)
+            }
+            else -> RectangularShape(listOf<Int>(height, width))
         }
 
-        val configuration = Configuration(rule as IGameRule, shape, listOf(width, height), playerNames)
+        val configuration = Configuration(rule, shape, listOf(width, height), playerNames)
 
         gameControl = GameControl(repository)
         gameControl.startGame(configuration)

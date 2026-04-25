@@ -3,14 +3,11 @@ package shapes
 import logic.Box
 import logic.Edge
 
-class CustomShape(private val boxMask: List<Box>): IFieldShape {
-    override fun getAllBoxes(): List<Box> {
-        return boxMask
-    }
+class CustomShape(private val boxMask: List<Box>) : IFieldShape {
+    override fun getAllBoxes(): List<Box> = boxMask
 
     override fun isValidEdge(edge: Edge): Boolean {
-        val x = edge.x
-        val y = edge.y
+        val (x, y) = edge.x to edge.y
         return if (edge.isHorizontal) {
             (Box(x, y) in boxMask) || (Box(x, y - 1) in boxMask)
         } else {
@@ -20,26 +17,17 @@ class CustomShape(private val boxMask: List<Box>): IFieldShape {
 
     override fun getAdjacentBoxes(edge: Edge): List<Box> {
         val boxes = mutableListOf<Box>()
-        val x = edge.x
-        val y = edge.y
+        val (x, y) = edge.x to edge.y
         if (edge.isHorizontal) {
-            val box1 = Box(x, y)
-            val box2 = Box(x - 1, y)
-            if (box1 in boxMask) {
-                boxes.add(box1)
-            }
-            if (box2 in boxMask) {
-                boxes.add(box2)
-            }
+            val below = Box(x, y)
+            val above = Box(x, y - 1)
+            if (below in boxMask) boxes.add(below)
+            if (above in boxMask) boxes.add(above)
         } else {
-            val box1 = Box(x, y)
-            val box2 = Box(x, y - 1)
-            if (box1 in boxMask) {
-                boxes.add(box1)
-            }
-            if (box2 in boxMask) {
-                boxes.add(box2)
-            }
+            val right = Box(x, y)
+            val left = Box(x - 1, y)
+            if (right in boxMask) boxes.add(right)
+            if (left in boxMask) boxes.add(left)
         }
         return boxes
     }
