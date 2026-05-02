@@ -7,30 +7,30 @@ digraph ClassDiagram {
 
     subgraph cluster_0 {
         color = white;
-        IGameRule [label = "{«interface»\nIGameRule\n|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}", shape=record];
-        IFieldShape [label = "{«interface»\nIFieldShape\n|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}", shape=record];
+        IGameRule [label = "{«interface»\nIGameRule\n|+calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}", shape=record];
+        IFieldShape [label = "{«interface»\nIFieldShape\n|+ getAllBoxes(): List~Box~\l+ isValidEdge(edge: Edge): Boolean\l+ getAdjacentBoxes(edge: Edge): List<Box>\l}", shape=record];
     }
 
-    UI [label = "{UserInterface|\l- gameControl: GameControl\l- stats: StatisticsAndLeaderboard\l|+ fieldRendering()\l+ menuRendering()\l+ buttonRendering()\l+ showLeaderboard()\l}"];
-    GameControl [label = "{GameControl|\l- gameLogic: GameLogic\l- config: Configuration\l- saving: SavingAndLoading\l- currentPlayer: int\l|+ startGame()\l+ endGame()\l+ resetGame()\l}"];
+    UI [label = "{UserInterface|\l- scanner: Scanner(System.'int')\l- gameControl: GameControl\l- repository: Repository |+ start()\l}"];
+    GameControl [label = "{GameControl|\l- gameLogic: GameLogic\l- configuration: Configuration\l- players: List~Player!\l- board: Board\l- currentPlayerIndex: Int\l- isGameActive: Boolean\l|+ startGame(configuration: Configuration)\l+ makeMove(edge: Edge)\l+ endGame()\l+ resetGame()\l}"];
 
     Stats [label = "{StatisticsAndLeaderboard|\l- gamesHistory: List~Game~\l|+ ratingsCalculation()\l}"];
-    GameLogic [label = "{GameLogic|\l- board: Board\l- players: List~Player~\l- rule: IGameRule\l- shape: IFieldShape\l|+ validation()\l+ squaresSearch()\l+ scoring()\l+ gameEndCheck()\l}"];
+    GameLogic [label = "{GameLogic|\l- board: Board\l- players: List~Player~\l- rule: IGameRule\l- shape: IFieldShape\l|+ validation(edge: Edge): Boolean\l+ squaresSearch(edge: Edge): List~Box~\l+ scoring(boxes: List~Box~): Int\l+ gameEndCheck(): Boolean\l}"];
 
     subgraph cluster_1 {
         color = white;
-        CustomShape [label = "{CustomShape|\l- boxMask: List~Box~\l|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}"];
-        RectangularShape [label = "{RectangularShape\l- width: int\l- height: int\l|+ getAllBoxes()\l+ isValidEdge()\l+ getAdjacentBoxes()\l}"];
-        ClassicRule [label = "{ClassicRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
-        NoBonusRule [label = "{NoBonusRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
-        PenaltyRule [label = "{PenaltyRule\l|+ validateMove()\l+ calculateScore()\l+ isBonusTurn()\l}"];
+        CustomShape [label = "{CustomShape|\l- boxMask: List~Box~\l|+ getAllBoxes(): List~Box~\l+ isValidEdge(edge: Edge): Boolean\l+ getAdjacentBoxes(edge: Edge): List~Box~\l}"];
+        RectangularShape [label = "{RectangularShape\l- fieldSize: List~Int~\l|+ getAllBoxes(): List~Box~\l+ isValidEdge(edge: Edge): Boolean\l+ getAdjacentBoxes(edge: Edge): List~Box~\l}"];
+        ClassicRule [label = "{ClassicRule\l|+ calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}"];
+        NoBonusRule [label = "{NoBonusRule\l|+ calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}"];
+        PenaltyRule [label = "{PenaltyRule\l|+ calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}"];
     }
 
     subgraph cluster_3 {
         color = white;
-        SavingLoading [label = "{Repository|\l- connection: DBConnection\l|+ recordingGameToDatabase()\l+ readingHistory()\l+ playbackByTurns()\l}"];
-        Configuration [label = "{Configuration|\l- selectedRule: IGameRule\l- selectedShape: IFieldShape\l- fieldSize: int\l- playersNames: List~String~\l|+ selectingFieldShape()\l+ selectingRulesMode()\l+ selectingFieldSize()\l+ selectingNamesAndNumberOfPlayers()\l}"];
-        GameFactory [label = "{GameFactory\l|+ createRule(type: String): IGameRule\l+ createShape(type: String): IFieldShape\l}"];
+        SavingLoading [label = "{Repository|\l- dbFileName: String\l|+ saveGame(winnerName: String, playerNames: List~String~)\l+ readingHistory(): List~Pair~String, String~~\l+ close()\l}"];
+        Configuration [label = "{Configuration|\l- selectedRule: IGameRule\l- selectedShape: IFieldShape\l- fieldSize: List~Int~\l- playersNames: List~String~\l}"];
+        GameFactory [label = "{GameFactory|\l- typeRule: String\l- typeShape: String\l+ createRule(typeRule: String): IGameRule\l+ createShape(typeStape: String, fieldSize: List~Int~, boxMask: List~Box~): IFieldShape\l}"];
     }
 
     Configuration -> GameFactory [arrowhead="vee", label="использует"];
