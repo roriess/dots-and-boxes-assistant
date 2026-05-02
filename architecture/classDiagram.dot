@@ -1,0 +1,63 @@
+digraph ClassDiagram {
+    rankdir=TB;
+    nodesep=0.6;
+    ranksep=0.8;
+    node [shape=record, fontname="Arial"];
+    edge [fontname="Arial", fontsize=10];
+
+    subgraph cluster_0 {
+        color = white;
+        IGameRule [label = "{«interface»\nIGameRule\n|+calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}", shape=record];
+        IFieldShape [label = "{«interface»\nIFieldShape\n|+ getAllBoxes(): List~Box~\l+ isValidEdge(edge: Edge): Boolean\l+ getAdjacentBoxes(edge: Edge): List<Box>\l}", shape=record];
+    }
+
+    UI [label = "{UserInterface|\l- scanner: Scanner(System.'int')\l- gameControl: GameControl\l- repository: Repository |+ start()\l}"];
+    GameControl [label = "{GameControl|\l- gameLogic: GameLogic\l- configuration: Configuration\l- players: List~Player!\l- board: Board\l- currentPlayerIndex: Int\l- isGameActive: Boolean\l|+ startGame(configuration: Configuration)\l+ makeMove(edge: Edge)\l+ endGame()\l+ resetGame()\l}"];
+
+    Stats [label = "{StatisticsAndLeaderboard|\l- gamesHistory: List~Game~\l|+ ratingsCalculation()\l}"];
+    GameLogic [label = "{GameLogic|\l- board: Board\l- players: List~Player~\l- rule: IGameRule\l- shape: IFieldShape\l|+ validation(edge: Edge): Boolean\l+ squaresSearch(edge: Edge): List~Box~\l+ scoring(boxes: List~Box~): Int\l+ gameEndCheck(): Boolean\l}"];
+
+    subgraph cluster_1 {
+        color = white;
+        CustomShape [label = "{CustomShape|\l- boxMask: List~Box~\l|+ getAllBoxes(): List~Box~\l+ isValidEdge(edge: Edge): Boolean\l+ getAdjacentBoxes(edge: Edge): List~Box~\l}"];
+        RectangularShape [label = "{RectangularShape\l- fieldSize: List~Int~\l|+ getAllBoxes(): List~Box~\l+ isValidEdge(edge: Edge): Boolean\l+ getAdjacentBoxes(edge: Edge): List~Box~\l}"];
+        ClassicRule [label = "{ClassicRule\l|+ calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}"];
+        NoBonusRule [label = "{NoBonusRule\l|+ calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}"];
+        PenaltyRule [label = "{PenaltyRule\l|+ calculateScore(closedBoxesCount: Int): Int\l+ isBonusTurn(): Boolean\l}"];
+    }
+
+    subgraph cluster_3 {
+        color = white;
+        SavingLoading [label = "{Repository|\l- dbFileName: String\l|+ saveGame(winnerName: String, playerNames: List~String~)\l+ readingHistory(): List~Pair~String, String~~\l+ close()\l}"];
+        Configuration [label = "{Configuration|\l- selectedRule: IGameRule\l- selectedShape: IFieldShape\l- fieldSize: List~Int~\l- playersNames: List~String~\l}"];
+        GameFactory [label = "{GameFactory|\l- typeRule: String\l- typeShape: String\l+ createRule(typeRule: String): IGameRule\l+ createShape(typeStape: String, fieldSize: List~Int~, boxMask: List~Box~): IFieldShape\l}"];
+    }
+
+    Configuration -> GameFactory [arrowhead="vee", label="использует"];
+
+    GameFactory -> IGameRule [arrowhead="vee", label="создаёт реализации"];
+    GameFactory -> IFieldShape [arrowhead="vee", label="создаёт реализации"];
+
+    GameFactory -> ClassicRule [arrowhead="vee", label="создаёт"];
+    GameFactory -> NoBonusRule [arrowhead="vee", label="создаёт"];
+    GameFactory -> PenaltyRule [arrowhead="vee", label="создаёт"];
+    GameFactory -> RectangularShape [arrowhead="vee", label="создаёт"];
+    GameFactory -> CustomShape [arrowhead="vee", label="создаёт"];
+
+    ClassicRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    NoBonusRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    PenaltyRule -> IGameRule [arrowhead="empty", style=dashed, label="реализует"];
+    RectangularShape -> IFieldShape [arrowhead="empty", style=dashed, label="реализует"];
+    CustomShape -> IFieldShape [arrowhead="empty", style=dashed, label="реализует"];
+
+    UI -> GameControl [arrowhead="vee", label="вызывает"];
+    UI -> Stats [arrowhead="vee", label="запрашивает"];
+    Configuration -> UI [arrowhead="vee", label="передаёт настройки"];
+    GameControl -> GameLogic [arrowhead="vee", label="использует"];
+    GameControl -> SavingLoading [arrowhead="vee", label="сохраняет"];
+    GameControl -> Configuration [arrowhead="vee", label="получает"];
+    Stats -> SavingLoading [arrowhead="vee", label="сохраняет статистику"];
+
+    GameLogic -> IGameRule [arrowhead="vee", label="проверяет ход и считает очки"];
+    GameLogic -> IFieldShape [arrowhead="vee", label="получает квадраты и проверяет рёбра"];
+}
