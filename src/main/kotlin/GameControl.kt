@@ -4,7 +4,7 @@ import logic.Player
 import logic.Board
 
 class GameControl (private val repository: Repository) {
-    private lateinit var gameLogic: GameLogic
+    lateinit var gameLogic: GameLogic
     private lateinit var configuration: Configuration
     private lateinit var players: List<Player>
     private lateinit var board: Board
