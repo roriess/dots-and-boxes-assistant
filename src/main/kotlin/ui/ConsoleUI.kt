@@ -8,23 +8,17 @@ import logic.Box
 class ConsoleUI {
     private val scanner = Scanner(System.`in`)
     private lateinit var gameControl: GameControl
-    private lateinit var repository: Repository
 
     fun start() {
-        repository = Repository()
-
         while (true) {
             println("Dots and Boxes Assistant")
             println("1. Start new game")
-            println("2. Show leaderboard")
-            println("3. Exit")
+            println("2. Exit")
             print("Choose option: ")
             when (scanner.nextLine()) {
                 "1" -> startNewGame()
-                "2" -> showLeaderboard()
-                "3" -> {
+                "2" -> {
                     println("Goodbye!")
-                    repository.close()
                     return
                 }
                 else -> println("Invalid choice, try again.")
@@ -85,7 +79,6 @@ class ConsoleUI {
         }
 
         val configuration = Configuration(rule, shape, listOf(width, height), playerNames)
-        gameControl = GameControl(repository)
         gameControl.startGame(configuration)
 
         while (true) {
@@ -115,7 +108,6 @@ class ConsoleUI {
                     printGameState()
                     val winner = gameControl.getWinner()
                     println("Game over! Winner: ${winner.name} with score ${winner.score}")
-                    repository.saveGame(winner.name, configuration.playersNames)
                     break
                 }
             } catch (e: Exception) {
@@ -130,18 +122,5 @@ class ConsoleUI {
             println("${player.name}: ${player.score} points")
         }
         println("Current player: ${gameControl.getCurrentPlayer().name}")
-    }
-
-    private fun showLeaderboard() {
-        val history = repository.readHistory()
-        if (history.isEmpty()) {
-            println("No games played yet.")
-            return
-        }
-        println("Leaderboard")
-        println("Date\t\t\tWinner")
-        for ((date, winner) in history) {
-            println("$date\t$winner")
-        }
     }
 }
