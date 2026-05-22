@@ -24,6 +24,7 @@ import rules.PenaltyRule
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.platform.LocalDensity
+import shapes.CustomShape
 import kotlin.math.abs
 
 @Composable
@@ -48,6 +49,8 @@ fun StartScreen() {
             heightInput.toIntOrNull() ?: 3,
             widthInput.toIntOrNull() ?: 3,
             rule,
+            shapeType,
+            customBoxesInput,
             { showGameScreen = false }
         ) // отображение поля и промежуточных результатов
     } else {
@@ -231,9 +234,11 @@ fun GameScreen(
     height: Int,
     width: Int,
     rule: IGameRule,
+    shapeType: String,
+    customBoxesInput: String,
     onStartScreen: () -> Unit
 ) {
-    var gameControl by remember { mutableStateOf(createGameControl(playerNames, width, height, rule)) }
+    var gameControl by remember { mutableStateOf(createGameControl(playerNames, width, height, rule, shapeType, customBoxesInput)) }
     var updateTrigger by remember { mutableStateOf(0) } // триггер перерисовки
 
     val sizePx = LocalDensity.current.run { 600.dp.toPx() }
@@ -345,14 +350,19 @@ private fun DrawScope.drawGameField(
     }
 
     // Точки
-    for (x in 0..width) {
-        for (y in 0..height) {
-            drawCircle(
-                Color.Black,
-                10f,
-                Offset(x * stepX, y * stepY)
-            )
-        }
+    val points = mutableSetOf<Pair<Int, Int>>()
+    for (box in allBoxes) {
+        points.add(box.x to box.y)
+        points.add(box.x + 1 to box.y)
+        points.add(box.x to box.y + 1)
+        points.add(box.x + 1 to box.y + 1)
+    }
+    for ((x, y) in points) {
+        drawCircle(
+            Color.Black,
+            10f,
+            Offset(x * stepX, y * stepY)
+        )
     }
 }
 
@@ -360,9 +370,16 @@ private fun createGameControl(
     playerNames: List<String>,
     width: Int,
     height: Int,
-    rule: IGameRule
+    rule: IGameRule,
+    shapeType: String,
+    customBoxesInput: String
 ): GameControl {
-    val shape = RectangularShape(mutableListOf(height, width))
+    val shape = if (shapeType == "Custom") {
+        val boxes = parseBoxes(customBoxesInput). map {(x, y) -> logic.Box(x, y)}
+        CustomShape(boxes)
+    } else {
+        RectangularShape(mutableListOf(height, width))
+    }
     val configuration = Configuration(
         rule,
         shape,
