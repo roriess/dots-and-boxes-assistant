@@ -1,6 +1,5 @@
 package system
 
-import Repository
 import GameControl
 import Configuration
 import logic.*
@@ -14,11 +13,7 @@ class FullGameSystemTest {
 
     @Test
     fun `complete game on 2x2 board`() {
-        val memoryDbUrl = "jdbc:sqlite::memory:"
-        val connection = DriverManager.getConnection(memoryDbUrl)
-        val repository = Repository(connection)
-
-        val gameControl = GameControl(repository)
+        val gameControl = GameControl()
         val playersNames = listOf("1", "2")
         val rule = ClassicRule()
         val shape = RectangularShape(listOf(1, 1))
@@ -45,9 +40,5 @@ class FullGameSystemTest {
         val totalScore = gameControl.getPlayers().sumOf { it.score }
         assertEquals(1, totalScore)
 
-        val history = repository.readHistory()
-        assertTrue(history.isNotEmpty())
-        val (_, savedWinner) = history.first()
-        assertEquals(winner.name, savedWinner)
     }
 }

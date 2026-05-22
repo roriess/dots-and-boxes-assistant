@@ -53,7 +53,7 @@ fun StartScreen() {
     } else {
         StartScreenInterface(
             selectedRule,
-            { selectedRule = it },
+            { selectedRule = it},
             playersInput,
             { playersInput = it },
             widthInput,
@@ -78,16 +78,22 @@ fun StartScreen() {
 fun StartScreenInterface(
     selectedRule: String,
     onRuleChange: (String) -> Unit,
+
     playersInput: String,
     onPlayersInputChange: (String) -> Unit,
+
     widthInput: String,
     onWidthChange: (String) -> Unit,
+
     heightInput: String,
     onHeightChange: (String) -> Unit,
+
     shapeType: String,
     onShapeTypeChange: (String) -> Unit,
+
     customBoxesInput: String,
     onCustomBoxesInputChange: (String) -> Unit,
+
     onGameScreen: () -> Unit
 ) {
     Column(
@@ -228,7 +234,7 @@ fun GameScreen(
     onStartScreen: () -> Unit
 ) {
     var gameControl by remember { mutableStateOf(createGameControl(playerNames, width, height, rule)) }
-    var updateTrigger by remember { mutableStateOf(0) }  // триггер перерисовки
+    var updateTrigger by remember { mutableStateOf(0) } // триггер перерисовки
 
     val sizePx = LocalDensity.current.run { 600.dp.toPx() }
 
@@ -362,8 +368,7 @@ private fun createGameControl(
         shape,
         listOf(height, width),
         playerNames)
-    val repository = Repository()
-    val gameControl = GameControl(repository)
+    val gameControl = GameControl()
     gameControl.startGame(configuration)
     return gameControl
 }
