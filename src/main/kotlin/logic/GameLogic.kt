@@ -4,7 +4,7 @@ import rules.IGameRule
 import shapes.IFieldShape
 
 
-class GameLogic(val board: Board, private val players: List<Player>, private val rule: IGameRule, val shape: IFieldShape) {
+class GameLogic(val board: Board, private val rule: IGameRule, val shape: IFieldShape, players: List<Player>) {
     fun validation(edge: Edge): Boolean {
         return !board.isEdge(edge) && shape.isValidEdge(edge)
     }

@@ -17,6 +17,12 @@
 \titlepage
 \end{frame}
 
+\begin{frame}{Правила игры}
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{gameBoard.png}
+\end{center}
+\end{frame}
+
 \begin{frame}{Архитектура}
 \begin{center}
 \begin{tikzpicture}[
@@ -26,7 +32,7 @@
 \node[block, fill=gray!20] (ui) {UI (Compose Desktop)};
 \node[block, below=of ui, fill=gray!20] (gc) {GameControl};
 \node[block, below=of gc, fill=gray!20] (gl) {GameLogic};
-\node[block, below=of gl, fill=gray!20] (b) {Board / IGameRule / IFieldShape};
+\node[block, below=of gl, fill=gray!20] (b) {Data / IGameRule / IFieldShape};
 
 \draw[->, thick] (ui) -- node[right] {вызывает} (gc);
 \draw[->, thick] (gc) -- node[right] {использует} (gl);
@@ -36,15 +42,15 @@
 \vspace{0.5cm}
 \end{frame}
 
-\begin{frame}{Стартовый экран}
+\begin{frame}{Архитектура}
 \begin{center}
-\includegraphics[width=0.6\textwidth]{startScreen.png}
+\includegraphics[width=0.4\textwidth]{first.png}
 \end{center}
 \end{frame}
 
-\begin{frame}{Игровое поле}
+\begin{frame}{Архитектура}
 \begin{center}
-    \includegraphics[width=0.8\textwidth]{gameBoard.png}
+\includegraphics[width=0.8\textwidth]{second.png}
 \end{center}
 \end{frame}
 
