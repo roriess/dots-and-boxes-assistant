@@ -3,8 +3,7 @@ package logic
 import rules.IGameRule
 import shapes.IFieldShape
 
-
-class GameLogic(val board: Board, private val rule: IGameRule, val shape: IFieldShape, players: List<Player>) {
+class GameLogic(val board: Board, private val players: List<Player>, private val rule: IGameRule, val shape: IFieldShape) {
     fun validation(edge: Edge): Boolean {
         return !board.isEdge(edge) && shape.isValidEdge(edge)
     }
